@@ -420,13 +420,13 @@ namespace Pimp_Wars
                     variables.MoneySpent = variables.MoneySpent + meds * 20;
                     variables.RollPosition++;
                 }
-                else
-                {
+                //else if (ready == true)
+                //{
 
-                    rdy.wp2done = false;
-                    webBrowser2.Navigate(variables.URL + "go/");
-                    variables.RollPosition++;
-                }
+                //    rdy.wp2done = false;
+                //    webBrowser2.Navigate(variables.URL + "go/");
+                //    variables.RollPosition++;
+                //}
             }
 
             #endregion 
