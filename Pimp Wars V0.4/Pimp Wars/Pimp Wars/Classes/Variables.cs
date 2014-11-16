@@ -25,7 +25,7 @@ namespace Pimp_Wars
         public ulong Turns { get; set; }
         public ulong Reserve { get; set; }
         public ulong Whores { get; set; }
-        public ulong Thugs { get; set; }
+        //public ulong Thugs { get; set; }
         public ulong Condoms { get; set; }
         public ulong Weapons { get; set; }
         public ulong Crack { get; set; }
@@ -42,6 +42,18 @@ namespace Pimp_Wars
         public int check { get; set; }
 
         public int RollPosition { get; set; }
+
+        public ulong Thugs 
+        { 
+            get;
+
+            set
+            {
+
+            }
+
+        }
+
 
         public void SaveStats()
         {
