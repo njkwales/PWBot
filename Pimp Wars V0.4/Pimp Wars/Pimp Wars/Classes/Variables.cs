@@ -38,16 +38,38 @@ namespace Pimp_Wars
         public ulong AK47s { get; set; }
         public ulong turnstouse { get; set; }
         public ulong Payout { get; set; }
-        public ulong MoneySpent { get; set; }
-        public ulong GunsToBuy { get; set; }
         public int check { get; set; }
 
         public int RollPosition { get; set; }
 
+        #region Tek9 Variables
+
+        public ulong PriceOfPistols = 500;
+        public ulong PriceOfAKs = 5000;
+        public ulong GunsToBuy { get; set; }
+        public ulong PistolsToBuy { get; set; }
+        public ulong AKsToBuy { get; set; }
+        public ulong TotalSpend { get; set; }
+        ulong PistolToAKRatio;
+        
+
+        #endregion
+
         public void Update()
         {
             Subtract_Uint subtract = new Subtract_Uint();
+
+            PistolToAKRatio = (PriceOfAKs / PriceOfPistols);
             GunsToBuy = subtract.Subtract(Thugs, Weapons);
+            AKsToBuy = GunsToBuy;
+            PistolsToBuy = 0;
+            TotalSpend = GunsToBuy * PriceOfAKs;
+            while (TotalSpend > Money && AKsToBuy + PistolsToBuy >= GunsToBuy)
+	        {
+                AKsToBuy --;
+                PistolsToBuy = PistolsToBuy + Convert.ToUInt64(PistolToAKRatio) - 1;
+                TotalSpend = (AKsToBuy * PriceOfAKs) + (PistolsToBuy * PriceOfPistols);
+	        }
         }
 
         public void SaveStats()
