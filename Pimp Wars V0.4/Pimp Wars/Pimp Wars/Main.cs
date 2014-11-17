@@ -329,10 +329,10 @@ namespace Pimp_Wars
 
                 if (ready == true && variables.Whores > 1500)
                 {
-                    if (variables.Whores >= 1500 && variables.turnstouse > 90)
+                    if (variables.turnstouse > Convert.ToUInt64(textBox3.Text))
                     {
                         rdy.wp4done = false;
-                        GP.MakeCrack("90", webBrowser4.Document);
+                        GP.MakeCrack(textBox3.Text, webBrowser4.Document);
                         variables.RollPosition++;
                     }
                     else
@@ -341,10 +341,7 @@ namespace Pimp_Wars
                     }
 
                 }
-                else
-                {
-                    variables.RollPosition++;
-                }
+
             }
 
             #endregion
