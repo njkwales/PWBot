@@ -45,9 +45,7 @@ namespace Pimp_Wars
 
         private void button4_Click(object sender, EventArgs e)
         {
-            ulong a = 10;
-            ulong b = 1;
-            ulong c = subtract.Subtract(a, b);
+            variables.Update();
         }
 
         private void Main_Load(object sender, EventArgs e)
@@ -95,8 +93,8 @@ namespace Pimp_Wars
                 webBrowser2.Document.ExecCommand("SelectAll", false, null);
                 webBrowser2.Document.ExecCommand("Copy", false, null);
                 getStats(Clipboard.GetText());
-                variables.SaveStats();
                 variables.Update();
+                variables.SaveStats();
                 rdy.wp2done = true;
             }
         }
@@ -329,7 +327,7 @@ namespace Pimp_Wars
             {
                 ready = rdy.ReadyCheck();
 
-                if (ready == true && variables.Crack < variables.Whores * 10)
+                if (ready == true && variables.Whores > 1500)
                 {
                     if (variables.Whores >= 1500 && variables.turnstouse > 90)
                     {
@@ -381,7 +379,6 @@ namespace Pimp_Wars
                     if (beer > 0)
                     {
                         GP.CornerStore("", "", beer.ToString(), webBrowser5.Document);
-                        variables.MoneySpent = beer;
                     }
 
                     variables.RollPosition++;
@@ -407,7 +404,6 @@ namespace Pimp_Wars
                     ulong meds = (subtract.Subtract(variables.Whores, variables.Medicine) * 5);
                     //buy condoms *This looks doggy as your buying exactly 5 time your whores need to find a way to round ulong up*
                     GP.CornerStore("", meds.ToString(), "", webBrowser5.Document);
-                    variables.MoneySpent = variables.MoneySpent + meds * 20;
                     variables.RollPosition++;
                 }
                 else if (ready == true && variables.Whores < variables.Medicine && variables.Money >= subtract.Subtract(variables.Whores, variables.Medicine) * 20 && subtract.Subtract(variables.Whores, variables.Medicine) != 0)
@@ -418,7 +414,6 @@ namespace Pimp_Wars
                     ulong meds = subtract.Subtract(variables.Whores, variables.Medicine);
                     //buy condoms *This looks doggy as your buying exactly 5 time your whores need to find a way to round ulong up*
                     GP.CornerStore("", meds.ToString(), "", webBrowser5.Document);
-                    variables.MoneySpent = variables.MoneySpent + meds * 20;
                     variables.RollPosition++;
                 }
                 //else if (ready == true)
@@ -438,37 +433,11 @@ namespace Pimp_Wars
             {
                 ready = rdy.ReadyCheck();
                 
-                if (variables.Weapons <= variables.Thugs)
+                if (ready == true)
                 {
-                    if (ready == true & variables.Money > subtract.Subtract(variables.Thugs, (variables.Pistols * 500)))
-                    {
-                        ulong pistolstobuy = subtract.Subtract(variables.Thugs, variables.Pistols);
-                        ulong moneyleft = subtract.Subtract(variables.Money, (pistolstobuy * 500));
-                        ulong ak47stobuy = moneyleft / 5000 - 1;
-                        GP.Tek9Buy("", pistolstobuy.ToString(), "", "", ak47stobuy.ToString(), webBrowser6.Document);
-                        variables.RollPosition++;
-                    }
+                    GP.Tek9Buy("", variables.PistolsToBuy.ToString(), "", "", variables.AKsToBuy.ToString(), webBrowser6.Document);
+                    variables.RollPosition++;
                 }
-                //if (ready == true & variables.Pistols >= variables.Thugs)
-                //{
-                //    ulong ak47stobuy = subtract.Subtract((variables.Money / 5000), 1);
-                //    GP.Tek9Buy("", "", "", "", ak47stobuy.ToString(), webBrowser6.Document);
-                //    variables.RollPosition++;
-                //}
-                //else if (ready == true & variables.Money > subtract.Subtract(variables.Thugs, (variables.Pistols * 500)))
-                //{
-                //    ulong pistolstobuy = subtract.Subtract(variables.Thugs, variables.Pistols);
-                //    ulong moneyleft = subtract.Subtract(variables.Money, (pistolstobuy * 500));
-                //    ulong ak47stobuy = moneyleft / 5000 - 1;
-                //    GP.Tek9Buy("", pistolstobuy.ToString(), "", "", ak47stobuy.ToString(), webBrowser6.Document);
-                //    variables.RollPosition++;
-                //}
-                //else if (ready == true)
-                //{
-                //    ulong pistolstobuy = subtract.Subtract((variables.Money / 500), 1);
-                //    GP.Tek9Buy("", pistolstobuy.ToString(), "", "", "", webBrowser6.Document);
-                //    variables.RollPosition++;
-                //}
                 
             }
 
