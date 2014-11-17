@@ -25,7 +25,7 @@ namespace Pimp_Wars
         public ulong Turns { get; set; }
         public ulong Reserve { get; set; }
         public ulong Whores { get; set; }
-        //public ulong Thugs { get; set; }
+        public ulong Thugs { get; set; }
         public ulong Condoms { get; set; }
         public ulong Weapons { get; set; }
         public ulong Crack { get; set; }
@@ -39,21 +39,16 @@ namespace Pimp_Wars
         public ulong turnstouse { get; set; }
         public ulong Payout { get; set; }
         public ulong MoneySpent { get; set; }
+        public ulong GunsToBuy { get; set; }
         public int check { get; set; }
 
         public int RollPosition { get; set; }
 
-        public ulong Thugs 
-        { 
-            get;
-
-            set
-            {
-
-            }
-
+        public void Update()
+        {
+            Subtract_Uint subtract = new Subtract_Uint();
+            GunsToBuy = subtract.Subtract(Thugs, Weapons);
         }
-
 
         public void SaveStats()
         {

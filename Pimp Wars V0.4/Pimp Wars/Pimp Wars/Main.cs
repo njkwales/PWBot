@@ -96,6 +96,7 @@ namespace Pimp_Wars
                 webBrowser2.Document.ExecCommand("Copy", false, null);
                 getStats(Clipboard.GetText());
                 variables.SaveStats();
+                variables.Update();
                 rdy.wp2done = true;
             }
         }
@@ -436,27 +437,38 @@ namespace Pimp_Wars
             if(variables.RollPosition == 5)
             {
                 ready = rdy.ReadyCheck();
-                    
-                if (ready == true & variables.Pistols >= variables.Thugs)
+                
+                if (variables.Weapons <= variables.Thugs)
                 {
-                    ulong ak47stobuy = subtract.Subtract((variables.Money / 5000), 1);
-                    GP.Tek9Buy("", "", "", "", ak47stobuy.ToString(), webBrowser6.Document);
-                    variables.RollPosition++;
+                    if (ready == true & variables.Money > subtract.Subtract(variables.Thugs, (variables.Pistols * 500)))
+                    {
+                        ulong pistolstobuy = subtract.Subtract(variables.Thugs, variables.Pistols);
+                        ulong moneyleft = subtract.Subtract(variables.Money, (pistolstobuy * 500));
+                        ulong ak47stobuy = moneyleft / 5000 - 1;
+                        GP.Tek9Buy("", pistolstobuy.ToString(), "", "", ak47stobuy.ToString(), webBrowser6.Document);
+                        variables.RollPosition++;
+                    }
                 }
-                else if (ready == true & variables.Money > subtract.Subtract(variables.Thugs, (variables.Pistols * 500)))
-                {
-                    ulong pistolstobuy = subtract.Subtract(variables.Thugs, variables.Pistols);
-                    ulong moneyleft = subtract.Subtract(variables.Money, (pistolstobuy * 500));
-                    ulong ak47stobuy = moneyleft / 5000 - 1;
-                    GP.Tek9Buy("", pistolstobuy.ToString(), "", "", ak47stobuy.ToString(), webBrowser6.Document);
-                    variables.RollPosition++;
-                }
-                else if (ready == true)
-                {
-                    ulong pistolstobuy = subtract.Subtract((variables.Money / 500), 1);
-                    GP.Tek9Buy("", pistolstobuy.ToString(), "", "", "", webBrowser6.Document);
-                    variables.RollPosition++;
-                }
+                //if (ready == true & variables.Pistols >= variables.Thugs)
+                //{
+                //    ulong ak47stobuy = subtract.Subtract((variables.Money / 5000), 1);
+                //    GP.Tek9Buy("", "", "", "", ak47stobuy.ToString(), webBrowser6.Document);
+                //    variables.RollPosition++;
+                //}
+                //else if (ready == true & variables.Money > subtract.Subtract(variables.Thugs, (variables.Pistols * 500)))
+                //{
+                //    ulong pistolstobuy = subtract.Subtract(variables.Thugs, variables.Pistols);
+                //    ulong moneyleft = subtract.Subtract(variables.Money, (pistolstobuy * 500));
+                //    ulong ak47stobuy = moneyleft / 5000 - 1;
+                //    GP.Tek9Buy("", pistolstobuy.ToString(), "", "", ak47stobuy.ToString(), webBrowser6.Document);
+                //    variables.RollPosition++;
+                //}
+                //else if (ready == true)
+                //{
+                //    ulong pistolstobuy = subtract.Subtract((variables.Money / 500), 1);
+                //    GP.Tek9Buy("", pistolstobuy.ToString(), "", "", "", webBrowser6.Document);
+                //    variables.RollPosition++;
+                //}
                 
             }
 
