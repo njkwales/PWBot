@@ -297,91 +297,212 @@ namespace Pimp_Wars
 
             #endregion 
 
-            #region Use Turns
-
-            ready = rdy.ReadyCheck();
-            if (ready == true && variables.turnstouse > 0)
+            switch(variables.RollPosition)
             {
-                rdy.wp3done = false;
-                GP.Scout(textBox2.Text, webBrowser3.Document);
-                variables.turnstouse--;
+
+                #region
+                case 1:
+                    ready = rdy.ReadyCheck();
+
+                    if (ready == true && variables.Whores > 1500)
+                    {
+                        if (variables.turnstouse > Convert.ToUInt64(textBox3.Text))
+                        {
+                            rdy.wp4done = false;
+                            GP.MakeCrack(textBox3.Text, webBrowser4.Document);
+                            variables.RollPosition++;
+                        }
+                        else
+                        {
+                            variables.RollPosition++;
+                        }
+
+                    }
+                    break;
+                #endregion
+
+                #region
+
+                case 2:
+                    ready = rdy.ReadyCheck();
+
+                    if (ready == true && variables.turnstouse > 0)
+                    {
+                        rdy.wp3done = false;
+                        GP.Scout(textBox2.Text, webBrowser3.Document);
+                        variables.turnstouse--;
+                    }
+                    break;
+                #endregion
+
+                #region
+                case 3:
+                    ready = rdy.ReadyCheck();
+
+                    if (ready == true)
+                    {
+                        rdy.wp8done = false;
+                        GP.SetPayOut("100", webBrowser8.Document);
+                        variables.RollPosition++;
+                    }
+                    break;
+                #endregion
+
+                #region
+                case 4:
+                    ready = rdy.ReadyCheck();
+
+                    if (ready == true && variables.Beer < variables.Thugs)
+                    {
+                        ulong beer = variables.Thugs - variables.Beer;
+
+                        if (beer > 0)
+                        {
+                            GP.CornerStore("", "", beer.ToString(), webBrowser5.Document);
+                        }
+
+                        variables.RollPosition++;
+
+                }
+                    break;
+                #endregion
+
+                #region
+                case 5:
+                    //Check if webpages are available to use
+                    ready = rdy.ReadyCheck();
+
+                    //if webpages are available and there are less condoms than whores and you have enough money buy condoms
+                    if (ready == true && variables.Whores * 5 < variables.Medicine && variables.Money > (subtract.Subtract(variables.Whores, variables.Medicine) * 5) * 20)
+                    {
+                        //send wepage 5 unavailable signal
+                        rdy.wp5done = false;
+                        //calculate how many condoms to buy
+                        ulong meds = (subtract.Subtract(variables.Whores, variables.Medicine) * 5);
+                        //buy condoms *This looks doggy as your buying exactly 5 time your whores need to find a way to round ulong up*
+                        GP.CornerStore("", meds.ToString(), "", webBrowser5.Document);
+                        variables.RollPosition++;
+                    }
+                    else if (ready == true && variables.Whores < variables.Medicine && variables.Money >= subtract.Subtract(variables.Whores, variables.Medicine) * 20 && subtract.Subtract(variables.Whores, variables.Medicine) != 0)
+                    {
+                        //send wepage 5 unavailable signal
+                        rdy.wp5done = false;
+                        //calculate how many condoms to buy
+                        ulong meds = subtract.Subtract(variables.Whores, variables.Medicine);
+                        //buy condoms *This looks doggy as your buying exactly 5 time your whores need to find a way to round ulong up*
+                        GP.CornerStore("", meds.ToString(), "", webBrowser5.Document);
+                        variables.RollPosition++;
+                    }
+                    //else if (ready == true)
+                    //{
+
+                    //    rdy.wp2done = false;
+                    //    webBrowser2.Navigate(variables.URL + "go/");
+                    //    variables.RollPosition++;
+                    //}
+                    break;
+                #endregion
+
+                #region
+                case 6:
+                    ready = rdy.ReadyCheck();
+                
+                    if (ready == true)
+                    {
+                        GP.Tek9Buy("", variables.PistolsToBuy.ToString(), "", "", variables.AKsToBuy.ToString(), webBrowser6.Document);
+                        variables.RollPosition++;
+                    }
+                    break;
+                #endregion
+
+                #region
+                case 8:
+                    variables.RollPosition = 0;
+                    timer1.Enabled = false;
+                    break;
+                #endregion
+
             }
 
+            #region Use Turns *1*
 
-            #endregion 
+            //if (variables.RollPosition == 1)
+            //{
+            //    ready = rdy.ReadyCheck();
 
-            #region Start Post Roll Stuff *0*
-
-            if (variables.turnstouse == 0 && variables.RollPosition == 0)
-            {
-                variables.RollPosition = 1;
-            }
+            //    if (ready == true && variables.turnstouse > 0)
+            //    {
+            //        rdy.wp3done = false;
+            //        GP.Scout(textBox2.Text, webBrowser3.Document);
+            //        variables.turnstouse--;
+            //    }
+            //}
 
             #endregion
 
-            #region roll for crack *1*
+            #region roll for crack *2*
 
-            ready = rdy.ReadyCheck();
+            //ready = rdy.ReadyCheck();
 
-            if (variables.RollPosition == 1)
-            {
-                ready = rdy.ReadyCheck();
+            //if (variables.RollPosition == 2)
+            //{
+            //    ready = rdy.ReadyCheck();
 
-                if (ready == true && variables.Whores > 1500)
-                {
-                    if (variables.turnstouse > Convert.ToUInt64(textBox3.Text))
-                    {
-                        rdy.wp4done = false;
-                        GP.MakeCrack(textBox3.Text, webBrowser4.Document);
-                        variables.RollPosition++;
-                    }
-                    else
-                    {
-                        variables.RollPosition++;
-                    }
+            //    if (ready == true && variables.Whores > 1500)
+            //    {
+            //        if (variables.turnstouse > Convert.ToUInt64(textBox3.Text))
+            //        {
+            //            rdy.wp4done = false;
+            //            GP.MakeCrack(textBox3.Text, webBrowser4.Document);
+            //            variables.RollPosition++;
+            //        }
+            //        else
+            //        {
+            //            variables.RollPosition++;
+            //        }
 
-                }
+            //    }
 
-            }
+            //}
 
             #endregion
 
             #region Post Jump Set Pay out *2*
 
-            if (variables.RollPosition == 2)
-            {
-                ready = rdy.ReadyCheck();
+            //if (variables.RollPosition == 2)
+            //{
+            //    ready = rdy.ReadyCheck();
 
-                if (ready == true)
-                {
-                    rdy.wp8done = false;
-                    GP.SetPayOut("100", webBrowser8.Document);
-                    variables.RollPosition++;
-                }
-            }
+            //    if (ready == true)
+            //    {
+            //        rdy.wp8done = false;
+            //        GP.SetPayOut("100", webBrowser8.Document);
+            //        variables.RollPosition++;
+            //    }
+            //}
             
 
             #endregion 
 
             #region Post Jump Buy Beer *3*
 
-            if (variables.RollPosition == 3)
-            {
-                ready = rdy.ReadyCheck();
+            //if (variables.RollPosition == 3)
+            //{
+            //    ready = rdy.ReadyCheck();
 
-                if (ready == true && variables.Beer < variables.Thugs)
-                {
-                    ulong beer = variables.Thugs - variables.Beer;
+            //    if (ready == true && variables.Beer < variables.Thugs)
+            //    {
+            //        ulong beer = variables.Thugs - variables.Beer;
 
-                    if (beer > 0)
-                    {
-                        GP.CornerStore("", "", beer.ToString(), webBrowser5.Document);
-                    }
+            //        if (beer > 0)
+            //        {
+            //            GP.CornerStore("", "", beer.ToString(), webBrowser5.Document);
+            //        }
 
-                    variables.RollPosition++;
+            //        variables.RollPosition++;
 
-                }
-            }
+            //    }
+            //}
 
             #endregion 
 
@@ -426,27 +547,27 @@ namespace Pimp_Wars
 
             #region Post Jump Buy Guns *5*
 
-            if(variables.RollPosition == 5)
-            {
-                ready = rdy.ReadyCheck();
+            //if(variables.RollPosition == 5)
+            //{
+            //    ready = rdy.ReadyCheck();
                 
-                if (ready == true)
-                {
-                    GP.Tek9Buy("", variables.PistolsToBuy.ToString(), "", "", variables.AKsToBuy.ToString(), webBrowser6.Document);
-                    variables.RollPosition++;
-                }
+            //    if (ready == true)
+            //    {
+            //        GP.Tek9Buy("", variables.PistolsToBuy.ToString(), "", "", variables.AKsToBuy.ToString(), webBrowser6.Document);
+            //        variables.RollPosition++;
+            //    }
                 
-            }
+            //}
 
             #endregion 
 
             #region Finish
 
-            if (variables.RollPosition == 5)
-            {
-                variables.RollPosition = 0;
-                timer1.Enabled = false;
-            }
+            //if (variables.RollPosition == 5)
+            //{
+            //    variables.RollPosition = 0;
+            //    timer1.Enabled = false;
+            //}
 
             #endregion
         }
