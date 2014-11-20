@@ -58,11 +58,14 @@ namespace Pimp_Wars
             if (Thugs != "")
             {
                 doc.GetElementById("bt").SetAttribute("Value", Thugs);
+                //doc.GetElementById("bt").Focus();
+                //System.Windows.Forms.SendKeys.Send("{`}");
             }
 
             if (Pistols != "")
             {
                 doc.GetElementById("bw1").SetAttribute("Value", Pistols);
+
             }
 
             if (Shotgun != "")

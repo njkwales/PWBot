@@ -36,11 +36,14 @@ namespace Pimp_Wars
         public ulong Shotguns { get; set; }
         public ulong MP5s { get; set; }
         public ulong AK47s { get; set; }
-        public ulong turnstouse { get; set; }
+        public ulong NoOfRolls { get; set; }
         public ulong Payout { get; set; }
         public int check { get; set; }
+        public ulong CrackTurnsToRoll { get; set; }
 
         public int RollPosition { get; set; }
+
+        List<string> Log = new List<string>();
 
         #region Tek9 Variables
 
@@ -50,12 +53,14 @@ namespace Pimp_Wars
         public ulong PistolsToBuy { get; set; }
         public ulong AKsToBuy { get; set; }
         public ulong TotalSpend { get; set; }
-        ulong PistolToAKRatio;
-        
+        public ulong PistolToAKRatio;
+        public ulong ThugsToBuy { get; set; }
+        public ulong MedsToBuy { get; set; }
 
         #endregion
 
-        public void Update()
+
+        public void GunsToBuyCalc()
         {
             Subtract_Uint subtract = new Subtract_Uint();
 
@@ -64,12 +69,52 @@ namespace Pimp_Wars
             AKsToBuy = GunsToBuy;
             PistolsToBuy = 0;
             TotalSpend = GunsToBuy * PriceOfAKs;
-            while (TotalSpend > Money && AKsToBuy + PistolsToBuy >= GunsToBuy)
-	        {
-                AKsToBuy --;
-                PistolsToBuy = PistolsToBuy + Convert.ToUInt64(PistolToAKRatio) - 1;
-                TotalSpend = (AKsToBuy * PriceOfAKs) + (PistolsToBuy * PriceOfPistols);
-	        }
+
+            if(Money > GunsToBuy * PriceOfPistols)
+            {
+                while (TotalSpend > Money && AKsToBuy > 0)
+                {
+                    AKsToBuy--;
+                    TotalSpend = AKsToBuy * PriceOfAKs;
+                }
+
+                while ((AKsToBuy + PistolsToBuy) < GunsToBuy && AKsToBuy > 0)
+                {
+                    AKsToBuy--;
+                    PistolsToBuy = PistolsToBuy + Convert.ToUInt64(PistolToAKRatio);
+                    TotalSpend = (AKsToBuy * PriceOfAKs) + (PistolsToBuy * PriceOfPistols);
+                }
+            }
+            else if(Money < GunsToBuy * PriceOfPistols)
+            {
+                AKsToBuy = 0;
+                PistolsToBuy = Money / PriceOfPistols;
+            }
+
+
+
+        }
+
+        public void ThugsToBuyCalc()
+        {
+            Subtract_Uint Maths = new Subtract_Uint();
+            ThugsToBuy = Maths.Subtract((Money / 1000), 1);
+        }
+
+        public void MedsToBuyCalc()
+        {
+            Subtract_Uint Maths = new Subtract_Uint();
+            MedsToBuy = Maths.Subtract((Whores * 5), Medicine);
+        }
+
+        public void CalcRolls(ulong TotalTurns, ulong TurnsPerRoll)
+        {
+            NoOfRolls = TotalTurns / TurnsPerRoll;
+        }
+
+        public void CrackTurnsToRollCalc()
+        {
+            CrackTurnsToRoll = ((Whores / 15) * NoOfRolls) / (Thugs + (Thugs / 2) + (Thugs / 10));
         }
 
         public void SaveStats()
