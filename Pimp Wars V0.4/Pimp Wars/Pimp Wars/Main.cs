@@ -28,14 +28,13 @@ namespace Pimp_Wars
 
         private void button1_Click(object sender, EventArgs e)
         {
-            ulong Turns = Convert.ToUInt64(textBox1.Text) - 90;
-            Turns = Turns / Convert.ToUInt64(textBox2.Text);
-            RollTurns(Turns);
+            variables.CalcRolls(Convert.ToUInt64(textBox1.Text), Convert.ToUInt64(textBox2.Text));
+            RollTurns(variables.NoOfRolls);
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            variables.turnstouse = 1;
+            System.Windows.Forms.SendKeys.Send("{`}");
         }
 
         private void button3_Click(object sender, EventArgs e)
@@ -45,7 +44,8 @@ namespace Pimp_Wars
 
         private void button4_Click(object sender, EventArgs e)
         {
-            variables.Update();
+            variables.GunsToBuyCalc();
+            MessageBox.Show(variables.AKsToBuy.ToString() + " AK's " + variables.PistolsToBuy.ToString() + " Pistols " + ((variables.AKsToBuy * 5000) + (variables.PistolsToBuy * 500)));
         }
 
         private void Main_Load(object sender, EventArgs e)
@@ -93,8 +93,8 @@ namespace Pimp_Wars
                 webBrowser2.Document.ExecCommand("SelectAll", false, null);
                 webBrowser2.Document.ExecCommand("Copy", false, null);
                 getStats(Clipboard.GetText());
-                variables.Update();
                 variables.SaveStats();
+                listBox1.TopIndex = listBox1.Items.Count - 1;
                 rdy.wp2done = true;
             }
         }
@@ -244,10 +244,10 @@ namespace Pimp_Wars
 
         private void RollTurns(ulong turnstoroll)
         {
-            variables.turnstouse = turnstoroll;
             GamePlay GP = new GamePlay();
             GP.SetPayOut("1", webBrowser8.Document);
             timer1.Enabled = true;
+            variables.RollPosition = 1;
         }
 
         private void timer1_Tick(object sender, EventArgs e)
@@ -259,83 +259,55 @@ namespace Pimp_Wars
 
             #endregion
 
-            #region Condom Check
-
-            //Check if webpages are available to use
-            ready = rdy.ReadyCheck();
-            //if webpages are available and there are less condoms than whores and you have enough money buy condoms
-            if (ready == true && variables.Whores > variables.Condoms && variables.Money >= variables.Whores * 20)
-            {
-                //send wepage 5 unavailable signal
-                rdy.wp5done = false;
-                //calculate how many condoms to buy
-                ulong condoms = variables.Whores * 20;
-                //buy condoms *This looks doggy as your buying exactly 20 time your whores need to find a way to round ulong up*
-                GP.CornerStore(condoms.ToString(), "", "", webBrowser5.Document);
-            }
-            //If you dont have enough money to buy condoms roll 1 turn
-            else if (ready == true &&  variables.Whores > variables.Condoms && variables.Money < variables.Whores * 20)
-            {
-                //send wepage 3 unavailable signal
-                rdy.wp3done = false;
-                //Scout 5 Turn
-                GP.Scout("5", webBrowser3.Document);
-            }
-
-            #endregion
-
-            #region Buy Thugs
-
-            ready = rdy.ReadyCheck();
-            ulong Turnskk = variables.turnstouse * Convert.ToUInt64(textBox2.Text) + 90;
-            if (ready == true && Turnskk > Convert.ToUInt64(textBox3.Text) && variables.Money > 2000)
-            {
-                rdy.wp6done = false;
-                ulong thugstobuy = (variables.Money / 1000) - 1;
-                GP.Tek9Buy(thugstobuy.ToString(), "", "", "", "", webBrowser6.Document);
-            }
-
-            #endregion 
-
             switch(variables.RollPosition)
             {
 
-                #region
+                #region Roll Crack
+
                 case 1:
                     ready = rdy.ReadyCheck();
+                    variables.CrackTurnsToRollCalc();
 
                     if (ready == true && variables.Whores > 1500)
                     {
-                        if (variables.turnstouse > Convert.ToUInt64(textBox3.Text))
-                        {
-                            rdy.wp4done = false;
-                            GP.MakeCrack(textBox3.Text, webBrowser4.Document);
-                            variables.RollPosition++;
-                        }
-                        else
-                        {
-                            variables.RollPosition++;
-                        }
-
+                        rdy.wp4done = false;
+                        GP.MakeCrack(variables.CrackTurnsToRoll.ToString(), webBrowser4.Document);
+                        variables.NoOfRolls = variables.NoOfRolls - variables.CrackTurnsToRoll;
+                        variables.RollPosition++;
+                        listBox1.Items.Add("Rolling " + variables.CrackTurnsToRoll.ToString() + " for crack");
                     }
+                    else if (variables.Whores <= 1500)
+                    {
+                        variables.RollPosition++;
+                        listBox1.Items.Add("Under 1500 Whores skipping crack rolls");
+                    }
+
                     break;
+
                 #endregion
 
-                #region
+                #region Roll Turns
 
                 case 2:
                     ready = rdy.ReadyCheck();
 
-                    if (ready == true && variables.turnstouse > 0)
+                    if (ready == true && variables.NoOfRolls > 0)
                     {
                         rdy.wp3done = false;
                         GP.Scout(textBox2.Text, webBrowser3.Document);
-                        variables.turnstouse--;
+                        listBox1.Items.Add("Rolling : " + textBox2.Text + " turns" + " - Rolls left : " + variables.NoOfRolls);
+                        variables.NoOfRolls--;
+                        variables.RollPosition = 99;
+                    }
+                    else if (variables.NoOfRolls <= 0)
+                    {
+                        variables.RollPosition++;
                     }
                     break;
+
                 #endregion
 
-                #region
+                #region Set Payout High
                 case 3:
                     ready = rdy.ReadyCheck();
 
@@ -348,7 +320,7 @@ namespace Pimp_Wars
                     break;
                 #endregion
 
-                #region
+                #region Buy Beer
                 case 4:
                     ready = rdy.ReadyCheck();
 
@@ -367,49 +339,38 @@ namespace Pimp_Wars
                     break;
                 #endregion
 
-                #region
+                #region Buy Meds
                 case 5:
-                    //Check if webpages are available to use
+
                     ready = rdy.ReadyCheck();
+                    variables.MedsToBuyCalc();
 
-                    //if webpages are available and there are less condoms than whores and you have enough money buy condoms
-                    if (ready == true && variables.Whores * 5 < variables.Medicine && variables.Money > (subtract.Subtract(variables.Whores, variables.Medicine) * 5) * 20)
+                    if (ready == true && variables.MedsToBuy > 0)
                     {
-                        //send wepage 5 unavailable signal
+                        //send webpage 5 unavailable signal
                         rdy.wp5done = false;
-                        //calculate how many condoms to buy
-                        ulong meds = (subtract.Subtract(variables.Whores, variables.Medicine) * 5);
                         //buy condoms *This looks doggy as your buying exactly 5 time your whores need to find a way to round ulong up*
-                        GP.CornerStore("", meds.ToString(), "", webBrowser5.Document);
+                        GP.CornerStore("", variables.MedsToBuy.ToString(), "", webBrowser5.Document);
                         variables.RollPosition++;
                     }
-                    else if (ready == true && variables.Whores < variables.Medicine && variables.Money >= subtract.Subtract(variables.Whores, variables.Medicine) * 20 && subtract.Subtract(variables.Whores, variables.Medicine) != 0)
+                    else if (ready == true && variables.MedsToBuy == 0)
                     {
-                        //send wepage 5 unavailable signal
-                        rdy.wp5done = false;
-                        //calculate how many condoms to buy
-                        ulong meds = subtract.Subtract(variables.Whores, variables.Medicine);
-                        //buy condoms *This looks doggy as your buying exactly 5 time your whores need to find a way to round ulong up*
-                        GP.CornerStore("", meds.ToString(), "", webBrowser5.Document);
                         variables.RollPosition++;
                     }
-                    //else if (ready == true)
-                    //{
 
-                    //    rdy.wp2done = false;
-                    //    webBrowser2.Navigate(variables.URL + "go/");
-                    //    variables.RollPosition++;
-                    //}
                     break;
                 #endregion
 
-                #region
-                case 6:
+                #region Buy Guns
+                case 6: 
                     ready = rdy.ReadyCheck();
-                
+
+                    variables.GunsToBuyCalc();
+
                     if (ready == true)
                     {
                         GP.Tek9Buy("", variables.PistolsToBuy.ToString(), "", "", variables.AKsToBuy.ToString(), webBrowser6.Document);
+                        listBox1.Items.Add("Buying : " + variables.PistolsToBuy.ToString() + " Pistols & " + variables.AKsToBuy.ToString() + " AK's");
                         variables.RollPosition++;
                     }
                     break;
@@ -422,154 +383,77 @@ namespace Pimp_Wars
                     break;
                 #endregion
 
+                #region Checker
+
+                case 99:
+
+                    if (variables.Condoms < variables.Whores)
+                    {
+                        variables.RollPosition = 101;
+                    }
+                    else if (variables.NoOfRolls > Convert.ToUInt64(textBox3.Text) && variables.Money > 5000)
+                    {
+                        variables.RollPosition = 100;
+                    }
+                    else
+                    {
+                        variables.RollPosition = 2;
+                    }
+
+                    break;
+
+                #endregion
+
+                #region Thugs
+
+                case 100:
+
+                    ready = rdy.ReadyCheck();
+                    variables.ThugsToBuyCalc();
+                    if (ready == true)
+                    {
+                        rdy.wp6done = false;
+                        GP.Tek9Buy(variables.ThugsToBuy.ToString(), "", "", "", "", webBrowser6.Document);
+                        listBox1.Items.Add("Buying : " + variables.ThugsToBuy.ToString() + " thugs");
+                        variables.RollPosition = 2;
+                    }
+
+                    break;
+
+                #endregion
+
+                #region Condoms
+
+                case 101:
+
+                    //Check if webpages are available to use
+                    ready = rdy.ReadyCheck();
+                    //if webpages are available and there are less condoms than whores and you have enough money buy condoms
+                    if (ready == true && variables.Whores > variables.Condoms && variables.Money >= variables.Whores * 20)
+                    {
+                        //send wepage 5 unavailable signal
+                        rdy.wp5done = false;
+                        //calculate how many condoms to buy
+                        ulong condoms = variables.Whores * 20;
+                        //buy condoms *This looks doggy as your buying exactly 20 time your whores need to find a way to round ulong up*
+                        GP.CornerStore(condoms.ToString(), "", "", webBrowser5.Document);
+                        variables.RollPosition = 2;
+                    }
+                    //If you dont have enough money to buy condoms roll 1 turn
+                    else if (ready == true && variables.Whores > variables.Condoms && variables.Money < variables.Whores * 20)
+                    {
+                        //send wepage 3 unavailable signal
+                        rdy.wp3done = false;
+                        //Scout 5 Turn
+                        GP.Scout("5", webBrowser3.Document);
+                    }
+
+                    break;
+
+                #endregion
             }
 
-            #region Use Turns *1*
 
-            //if (variables.RollPosition == 1)
-            //{
-            //    ready = rdy.ReadyCheck();
-
-            //    if (ready == true && variables.turnstouse > 0)
-            //    {
-            //        rdy.wp3done = false;
-            //        GP.Scout(textBox2.Text, webBrowser3.Document);
-            //        variables.turnstouse--;
-            //    }
-            //}
-
-            #endregion
-
-            #region roll for crack *2*
-
-            //ready = rdy.ReadyCheck();
-
-            //if (variables.RollPosition == 2)
-            //{
-            //    ready = rdy.ReadyCheck();
-
-            //    if (ready == true && variables.Whores > 1500)
-            //    {
-            //        if (variables.turnstouse > Convert.ToUInt64(textBox3.Text))
-            //        {
-            //            rdy.wp4done = false;
-            //            GP.MakeCrack(textBox3.Text, webBrowser4.Document);
-            //            variables.RollPosition++;
-            //        }
-            //        else
-            //        {
-            //            variables.RollPosition++;
-            //        }
-
-            //    }
-
-            //}
-
-            #endregion
-
-            #region Post Jump Set Pay out *2*
-
-            //if (variables.RollPosition == 2)
-            //{
-            //    ready = rdy.ReadyCheck();
-
-            //    if (ready == true)
-            //    {
-            //        rdy.wp8done = false;
-            //        GP.SetPayOut("100", webBrowser8.Document);
-            //        variables.RollPosition++;
-            //    }
-            //}
-            
-
-            #endregion 
-
-            #region Post Jump Buy Beer *3*
-
-            //if (variables.RollPosition == 3)
-            //{
-            //    ready = rdy.ReadyCheck();
-
-            //    if (ready == true && variables.Beer < variables.Thugs)
-            //    {
-            //        ulong beer = variables.Thugs - variables.Beer;
-
-            //        if (beer > 0)
-            //        {
-            //            GP.CornerStore("", "", beer.ToString(), webBrowser5.Document);
-            //        }
-
-            //        variables.RollPosition++;
-
-            //    }
-            //}
-
-            #endregion 
-
-            #region Post Jump Meds *4*
-
-            if (variables.RollPosition == 4)
-            {
-                //Check if webpages are available to use
-                ready = rdy.ReadyCheck();
-
-                //if webpages are available and there are less condoms than whores and you have enough money buy condoms
-                if (ready == true && variables.Whores * 5 < variables.Medicine && variables.Money > (subtract.Subtract(variables.Whores, variables.Medicine) * 5) * 20)
-                {
-                    //send wepage 5 unavailable signal
-                    rdy.wp5done = false;
-                    //calculate how many condoms to buy
-                    ulong meds = (subtract.Subtract(variables.Whores, variables.Medicine) * 5);
-                    //buy condoms *This looks doggy as your buying exactly 5 time your whores need to find a way to round ulong up*
-                    GP.CornerStore("", meds.ToString(), "", webBrowser5.Document);
-                    variables.RollPosition++;
-                }
-                else if (ready == true && variables.Whores < variables.Medicine && variables.Money >= subtract.Subtract(variables.Whores, variables.Medicine) * 20 && subtract.Subtract(variables.Whores, variables.Medicine) != 0)
-                {
-                    //send wepage 5 unavailable signal
-                    rdy.wp5done = false;
-                    //calculate how many condoms to buy
-                    ulong meds = subtract.Subtract(variables.Whores, variables.Medicine);
-                    //buy condoms *This looks doggy as your buying exactly 5 time your whores need to find a way to round ulong up*
-                    GP.CornerStore("", meds.ToString(), "", webBrowser5.Document);
-                    variables.RollPosition++;
-                }
-                //else if (ready == true)
-                //{
-
-                //    rdy.wp2done = false;
-                //    webBrowser2.Navigate(variables.URL + "go/");
-                //    variables.RollPosition++;
-                //}
-            }
-
-            #endregion 
-
-            #region Post Jump Buy Guns *5*
-
-            //if(variables.RollPosition == 5)
-            //{
-            //    ready = rdy.ReadyCheck();
-                
-            //    if (ready == true)
-            //    {
-            //        GP.Tek9Buy("", variables.PistolsToBuy.ToString(), "", "", variables.AKsToBuy.ToString(), webBrowser6.Document);
-            //        variables.RollPosition++;
-            //    }
-                
-            //}
-
-            #endregion 
-
-            #region Finish
-
-            //if (variables.RollPosition == 5)
-            //{
-            //    variables.RollPosition = 0;
-            //    timer1.Enabled = false;
-            //}
-
-            #endregion
         }
 
     }
