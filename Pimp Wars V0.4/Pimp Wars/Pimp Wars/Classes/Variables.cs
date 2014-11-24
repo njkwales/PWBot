@@ -20,6 +20,11 @@ namespace Pimp_Wars
         public string Username { get; set; }
         public string Password { get; set; }
 
+        public ulong WhoresChange { get; set; }
+        public ulong ThugsChange { get; set; }
+        public ulong CondomsChange { get; set; }
+        public ulong CrackChange { get; set; }
+
         public ulong Worth { get; set; }
         public ulong Money { get; set; }
         public ulong Turns { get; set; }
@@ -59,7 +64,6 @@ namespace Pimp_Wars
 
         #endregion
 
-
         public void GunsToBuyCalc()
         {
             Subtract_Uint subtract = new Subtract_Uint();
@@ -91,6 +95,11 @@ namespace Pimp_Wars
                 PistolsToBuy = Money / PriceOfPistols;
             }
 
+            if(TotalSpend < Money )
+            {
+                AKsToBuy = AKsToBuy + (((Money - TotalSpend) / PriceOfAKs));
+            }
+
 
 
         }
@@ -114,7 +123,11 @@ namespace Pimp_Wars
 
         public void CrackTurnsToRollCalc()
         {
-            CrackTurnsToRoll = ((Whores / 15) * NoOfRolls) / (Thugs + (Thugs / 2) + (Thugs / 10));
+            CrackTurnsToRoll = ((Whores / 20) * NoOfRolls) / (Thugs + (Thugs / 2) + (Thugs / 10));
+            if (CrackTurnsToRoll == 0)
+            {
+                CrackTurnsToRoll = 1;
+            }
         }
 
         public void SaveStats()

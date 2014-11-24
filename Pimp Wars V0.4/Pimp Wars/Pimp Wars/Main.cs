@@ -16,6 +16,8 @@ namespace Pimp_Wars
         Variables variables = new Variables();
         Ready rdy = new Ready();
         Subtract_Uint subtract = new Subtract_Uint();
+        Log _log = new Log();
+
 
         public Main(String Alias, String URL, String Username, String Password)
         {
@@ -24,6 +26,7 @@ namespace Pimp_Wars
             variables.URL = URL;
             variables.Username = Username;
             variables.Password = Password;
+            _log.Show();
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -94,7 +97,7 @@ namespace Pimp_Wars
                 webBrowser2.Document.ExecCommand("Copy", false, null);
                 getStats(Clipboard.GetText());
                 variables.SaveStats();
-                listBox1.TopIndex = listBox1.Items.Count - 1;
+
                 rdy.wp2done = true;
             }
         }
@@ -187,12 +190,6 @@ namespace Pimp_Wars
 
         private void webBrowser8_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
         {
-            //string URL = webBrowser8.Url.ToString();
-
-            //if (URL == variables.URL + "go/online.pimp")
-            //{
-            //    webBrowser8.Navigate(variables.URL + "go/online.pimp");
-            //}
             string URL = webBrowser8.Url.ToString();
 
             if (URL != variables.URL + "go/index.pimp")
@@ -214,11 +211,8 @@ namespace Pimp_Wars
         {
             StatGrabber sg = new StatGrabber();
             var stats = sg.GetStatsbig(text);
-            richTextBox1.Text = "";
-            foreach (ulong K in stats)
-            {
-                richTextBox1.Text = richTextBox1.Text + K.ToString() + "\r\n";
-            }
+
+            _log.Stats(stats);
 
             string payout = webBrowser2.Document.GetElementById("p").GetAttribute("value");
             ulong Payout = Convert.ToUInt64(payout);
@@ -246,8 +240,10 @@ namespace Pimp_Wars
         {
             GamePlay GP = new GamePlay();
             GP.SetPayOut("1", webBrowser8.Document);
+            _log.LogEntry("Setting Pay out To 1");
             timer1.Enabled = true;
             variables.RollPosition = 1;
+            _log.LogEntry("Using " + textBox1.Text + " turns at " + textBox2.Text + " turns per roll for a total of " + variables.NoOfRolls + " Rolls");
         }
 
         private void timer1_Tick(object sender, EventArgs e)
@@ -274,12 +270,12 @@ namespace Pimp_Wars
                         GP.MakeCrack(variables.CrackTurnsToRoll.ToString(), webBrowser4.Document);
                         variables.NoOfRolls = variables.NoOfRolls - variables.CrackTurnsToRoll;
                         variables.RollPosition++;
-                        listBox1.Items.Add("Rolling " + variables.CrackTurnsToRoll.ToString() + " for crack");
+                        _log.LogEntry("Rolling " + variables.CrackTurnsToRoll.ToString() + " for crack");
                     }
                     else if (variables.Whores <= 1500)
                     {
                         variables.RollPosition++;
-                        listBox1.Items.Add("Under 1500 Whores skipping crack rolls");
+                        _log.LogEntry("Under 1500 Whores skipping crack rolls");
                     }
 
                     break;
@@ -295,13 +291,14 @@ namespace Pimp_Wars
                     {
                         rdy.wp3done = false;
                         GP.Scout(textBox2.Text, webBrowser3.Document);
-                        listBox1.Items.Add("Rolling : " + textBox2.Text + " turns" + " - Rolls left : " + variables.NoOfRolls);
+                        _log.LogEntry("Rolling : " + textBox2.Text + " turns" + " - Rolls left : " + variables.NoOfRolls);
                         variables.NoOfRolls--;
                         variables.RollPosition = 99;
                     }
                     else if (variables.NoOfRolls <= 0)
                     {
                         variables.RollPosition++;
+                        _log.LogEntry("Finished rolling turns");
                     }
                     break;
 
@@ -315,27 +312,24 @@ namespace Pimp_Wars
                     {
                         rdy.wp8done = false;
                         GP.SetPayOut("100", webBrowser8.Document);
+                        _log.LogEntry("Setting payout to 100");
                         variables.RollPosition++;
                     }
                     break;
                 #endregion
 
-                #region Buy Beer
+                #region Spare
+
                 case 4:
                     ready = rdy.ReadyCheck();
 
                     if (ready == true && variables.Beer < variables.Thugs)
                     {
-                        ulong beer = variables.Thugs - variables.Beer;
+                        
+                    }
 
-                        if (beer > 0)
-                        {
-                            GP.CornerStore("", "", beer.ToString(), webBrowser5.Document);
-                        }
+                    variables.RollPosition++;
 
-                        variables.RollPosition++;
-
-                }
                     break;
                 #endregion
 
@@ -350,11 +344,15 @@ namespace Pimp_Wars
                         //send webpage 5 unavailable signal
                         rdy.wp5done = false;
                         //buy condoms *This looks doggy as your buying exactly 5 time your whores need to find a way to round ulong up*
-                        GP.CornerStore("", variables.MedsToBuy.ToString(), "", webBrowser5.Document);
+                        GP.CornerStore("", variables.MedsToBuy.ToString(), variables.Thugs.ToString(), webBrowser5.Document);
+                        _log.LogEntry("Bought " + variables.MedsToBuy.ToString() + " meds & " + variables.Thugs.ToString() + "Beer");
                         variables.RollPosition++;
                     }
                     else if (ready == true && variables.MedsToBuy == 0)
                     {
+                        rdy.wp5done = false;
+                        GP.CornerStore("", "", variables.Thugs.ToString(), webBrowser5.Document);
+                        _log.LogEntry("No meds needed " + variables.Thugs.ToString() + " Beer bought");
                         variables.RollPosition++;
                     }
 
@@ -365,21 +363,21 @@ namespace Pimp_Wars
                 case 6: 
                     ready = rdy.ReadyCheck();
 
-                    variables.GunsToBuyCalc();
-
                     if (ready == true)
                     {
+                        variables.GunsToBuyCalc();
                         GP.Tek9Buy("", variables.PistolsToBuy.ToString(), "", "", variables.AKsToBuy.ToString(), webBrowser6.Document);
-                        listBox1.Items.Add("Buying : " + variables.PistolsToBuy.ToString() + " Pistols & " + variables.AKsToBuy.ToString() + " AK's");
+                        _log.LogEntry("Buying : " + variables.PistolsToBuy.ToString() + " Pistols & " + variables.AKsToBuy.ToString() + " AK's");
                         variables.RollPosition++;
                     }
                     break;
                 #endregion
 
                 #region
-                case 8:
+                case 7:
                     variables.RollPosition = 0;
                     timer1.Enabled = false;
+                    _log.LogEntry("Finshed");
                     break;
                 #endregion
 
@@ -391,7 +389,7 @@ namespace Pimp_Wars
                     {
                         variables.RollPosition = 101;
                     }
-                    else if (variables.NoOfRolls > Convert.ToUInt64(textBox3.Text) && variables.Money > 5000)
+                    else if ((Convert.ToUInt64(textBox1.Text) * Convert.ToUInt64(textBox2.Text)) > Convert.ToUInt64(textBox3.Text) && variables.Money > 5000)
                     {
                         variables.RollPosition = 100;
                     }
@@ -414,7 +412,7 @@ namespace Pimp_Wars
                     {
                         rdy.wp6done = false;
                         GP.Tek9Buy(variables.ThugsToBuy.ToString(), "", "", "", "", webBrowser6.Document);
-                        listBox1.Items.Add("Buying : " + variables.ThugsToBuy.ToString() + " thugs");
+                        _log.LogEntry("Buying : " + variables.ThugsToBuy.ToString() + " thugs");
                         variables.RollPosition = 2;
                     }
 
@@ -437,6 +435,7 @@ namespace Pimp_Wars
                         ulong condoms = variables.Whores * 20;
                         //buy condoms *This looks doggy as your buying exactly 20 time your whores need to find a way to round ulong up*
                         GP.CornerStore(condoms.ToString(), "", "", webBrowser5.Document);
+                        _log.LogEntry("Buying : " + condoms.ToString() + " Condoms");
                         variables.RollPosition = 2;
                     }
                     //If you dont have enough money to buy condoms roll 1 turn
@@ -446,6 +445,7 @@ namespace Pimp_Wars
                         rdy.wp3done = false;
                         //Scout 5 Turn
                         GP.Scout("5", webBrowser3.Document);
+                        _log.LogEntry("Not enough cash for condoms rolling turns");
                     }
 
                     break;
